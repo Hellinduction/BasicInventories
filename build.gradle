@@ -1,0 +1,99 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+wrapper {
+    gradleVersion = "8.1.1"
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+shadowJar {
+    relocate 'de.tr7zw.changeme.nbtapi', 'club.hellin.util.basicinventories.de.tr7zw.3_0_0.nbtapi'
+
+    minimize()
+
+    java {
+        withSourcesJar()
+    }
+}
+
+group = 'com.github.Hellinduction'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spigotmc-repo"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+    maven { url "https://repo.codemc.org/repository/maven-public/" }
+}
+
+dependencies {
+    compileOnly "org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT"
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    implementation "de.tr7zw:item-nbt-api:2.12.3"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def targetJavaVersion = 8
+java {
+    withSourcesJar()
+
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
