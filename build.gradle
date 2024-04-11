@@ -51,7 +51,7 @@ shadowJar {
 }
 
 group = 'com.github.Hellinduction'
-version = '1.0.3-SNAPSHOT'
+version = '1.0.4-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -74,9 +74,15 @@ dependencies {
     implementation "de.tr7zw:item-nbt-api:2.12.3"
 }
 
+def targetJavaVersion = 17
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+    withSourcesJar()
+
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 }
 
