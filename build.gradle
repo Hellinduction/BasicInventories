@@ -51,7 +51,7 @@ shadowJar {
 }
 
 group = 'com.github.Hellinduction'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.2-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -80,7 +80,7 @@ test {
     useJUnitPlatform()
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 17
 java {
     withSourcesJar()
 
