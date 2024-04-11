@@ -51,7 +51,7 @@ shadowJar {
 }
 
 group = 'com.github.Hellinduction'
-version = '1.0.2-SNAPSHOT'
+version = '1.0.3-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -63,9 +63,7 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
+    maven { url 'https://jitpack.io' }
     maven { url "https://repo.codemc.org/repository/maven-public/" }
 }
 
@@ -76,24 +74,16 @@ dependencies {
     implementation "de.tr7zw:item-nbt-api:2.12.3"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 test {
     useJUnitPlatform()
 }
 
-def targetJavaVersion = 17
-java {
-    withSourcesJar()
-
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
 tasks.withType(JavaCompile).configureEach {
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release = targetJavaVersion
-    }
+    options.compilerArgs.addAll(['--release', '17'])
 }
